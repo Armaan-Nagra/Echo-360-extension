@@ -1,0 +1,19 @@
+{
+    "manifest_version": 3,
+    "name": "Echo 360 Downloader",
+    "description": "A Chrome Extension to allow you to download any Echo 360 Lecture at Warwick",
+    "version": "1.0",
+    "action": {
+        "default_title": "OOGA BOOGA",
+        "default_popup": "popup/popup.html"
+    },
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "permissions": [
+        "webRequest"
+    ],
+    "background": {
+        "service_worker": "service-worker.js"
+    }
+}
