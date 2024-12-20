@@ -3,14 +3,46 @@
 // It would correspond to the background script in chrome extensions v2.
 
 console.log("This prints to the adfds of the service worker (background script)")
-console.log("OOGA BOOGA")
 
 // This code runs in the service worker (background) context
 
-function logURL(details) {
-    console.log(details.url);
+let latestAudio = null;
+let latestVideo = null;
+
+function storeInStorage(key, value) {
+    chrome.storage.local.set({ [key]: value }, function () {
+        console.log(`Stored ${key}: ${value}`);
+    });
 }
-  
-chrome.webRequest.onCompleted.addListener(logURL,
-    {urls: ["*://content.echo360.org.uk/*.m3u8*"]}
+
+function getFromStorage(key) {
+    chrome.storage.local.get([key], function (result) {
+        console.log(`Retrieved ${key}: ${result[key]}`);
+    });
+}
+
+function logAudio(details) {
+    if(latestAudio == null){
+        latestAudio = details.url;
+
+        storeInStorage("latestAudio", latestAudio);
+    }
+}
+
+function logVideo(details) {
+    if(latestVideo == null){
+        latestVideo = details.url;
+
+        storeInStorage("latestVideo", latestVideo);
+    }
+}
+
+console.log(getFromStorage("latestAudio"))
+
+chrome.webRequest.onCompleted.addListener(logAudio,
+    {urls: ["*://content.echo360.org.uk/*s0q1.m4s*"]}
+);
+
+chrome.webRequest.onCompleted.addListener(logVideo,
+    {urls: ["*://content.echo360.org.uk/*s1q1.m4s*"]}
 );
