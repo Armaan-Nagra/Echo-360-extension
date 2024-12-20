@@ -2,8 +2,6 @@
 // when the extension is installed or refreshed (or when you access its console).
 // It would correspond to the background script in chrome extensions v2.
 
-console.log("This prints to the adfds of the service worker (background script)")
-
 // This code runs in the service worker (background) context
 
 let latestAudio = null;
@@ -22,22 +20,14 @@ function getFromStorage(key) {
 }
 
 function logAudio(details) {
-    if(latestAudio == null){
-        latestAudio = details.url;
-
-        storeInStorage("latestAudio", latestAudio);
-    }
+    latestAudio = details.url;
+    storeInStorage("latestAudio", latestAudio);
 }
 
 function logVideo(details) {
-    if(latestVideo == null){
-        latestVideo = details.url;
-
-        storeInStorage("latestVideo", latestVideo);
-    }
+    latestVideo = details.url;
+    storeInStorage("latestVideo", latestVideo);
 }
-
-console.log(getFromStorage("latestAudio"))
 
 chrome.webRequest.onCompleted.addListener(logAudio,
     {urls: ["*://content.echo360.org.uk/*s0q1.m4s*"]}
@@ -46,3 +36,4 @@ chrome.webRequest.onCompleted.addListener(logAudio,
 chrome.webRequest.onCompleted.addListener(logVideo,
     {urls: ["*://content.echo360.org.uk/*s1q1.m4s*"]}
 );
+
