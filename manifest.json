@@ -14,7 +14,9 @@
         "webRequest",
         "downloads",
         "storage",
-        "unlimitedStorage"
+        "unlimitedStorage",
+        "scripting",
+        "activeTab"
     ],
     "background": {
         "service_worker": "service-worker.js"
