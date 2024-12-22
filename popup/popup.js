@@ -1,53 +1,200 @@
-// Include FFmpeg.js (WebAssembly) in your project
-import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+// import { createFFmpeg } from '@ffmpeg/ffmpeg';
 
-// Button click handler for downloading and merging files
-document.getElementById("download").addEventListener("click", async () => {
-    const statusElement = document.getElementById("status");
-    const ffmpeg = createFFmpeg({ log: true }); // Enable logging for debugging
+// document.getElementById("download").addEventListener("click", async () => {
+//     console.log("TESTING TESTING")
+//     const status = document.getElementById("status");
+//     status.textContent = "Fetching files...";
 
-    try {
-        console.log("Button Clicked")
-        statusElement.textContent = "Loading FFmpeg...";
-        await ffmpeg.load(); // Load FFmpeg WebAssembly module
+//     // Retrieve URLs from storage
+//     const audioUrl = await new Promise(resolve =>
+//         chrome.storage.local.get(["latestAudio"], result => resolve(result.latestAudio))
+//     );
 
-        // Retrieve stored URLs
-        const { latestAudio, latestVideo } = await chrome.storage.local.get(["latestAudio", "latestVideo"]);
+//     const videoUrl = await new Promise(resolve =>
+//         chrome.storage.local.get(["latestVideo"], result => resolve(result.latestVideo))
+//     );
 
-        if (!latestAudio || !latestVideo) {
-            statusElement.textContent = "Error: Audio or video URL not found.";
-            return;
-        }
+//     if (!audioUrl || !videoUrl) {
+//         status.textContent = "Audio or video not found!";
+//         return;
+//     }
 
-        // Fetch audio and video files
-        statusElement.textContent = "Downloading files...";
-        const audioBlob = await fetchFile(latestAudio);
-        const videoBlob = await fetchFile(latestVideo);
+//     status.textContent = "Downloading files...";
+    
+//     // Fetch audio and video
+//     const [audioResponse, videoResponse] = await Promise.all([
+//         fetch(audioUrl),
+//         fetch(videoUrl)
+//     ]);
 
-        // Write files to FFmpeg's virtual file system
-        statusElement.textContent = "Preparing files...";
-        ffmpeg.FS('writeFile', 'audio.m4s', audioBlob);
-        ffmpeg.FS('writeFile', 'video.m4s', videoBlob);
+//     const audioBlob = await audioResponse.blob();
+//     const videoBlob = await videoResponse.blob();
 
-        // Merge audio and video into a single MP4
-        statusElement.textContent = "Merging files...";
-        await ffmpeg.run('-i', 'video.m4s', '-i', 'audio.m4s', '-c:v', 'copy', '-c:a', 'aac', 'output.mp4');
+//     const audioBuffer = await audioBlob.arrayBuffer();
+//     const videoBuffer = await videoBlob.arrayBuffer();
 
-        // Retrieve the merged file
-        const mergedFile = ffmpeg.FS('readFile', 'output.mp4');
+//     // Merge audio and video with FFmpeg.js
+//     status.textContent = "Merging files...";
+//     const ffmpeg = FFmpeg.createFFmpeg({ log: true });
+//     await ffmpeg.load();
 
-        // Create a blob URL and trigger download
-        const blob = new Blob([mergedFile.buffer], { type: 'video/mp4' });
-        const url = URL.createObjectURL(blob);
+//     ffmpeg.FS('writeFile', 'audio.m4a', new Uint8Array(audioBuffer));
+//     ffmpeg.FS('writeFile', 'video.mp4', new Uint8Array(videoBuffer));
 
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'merged_video.mp4'; // Set the desired file name
-        a.click();
+//     await ffmpeg.run('-i', 'video.mp4', '-i', 'audio.m4a', '-c:v', 'copy', '-c:a', 'aac', 'output.mp4');
+//     const mergedFile = ffmpeg.FS('readFile', 'output.mp4');
 
-        statusElement.textContent = "Download complete!";
-    } catch (error) {
-        console.error("An error occurred:", error);
-        statusElement.textContent = `Error: ${error.message}`;
-    }
+//     const mergedBlob = new Blob([mergedFile.buffer], { type: 'video/mp4' });
+//     const mergedUrl = URL.createObjectURL(mergedBlob);
+
+//     // Trigger download
+//     chrome.downloads.download({
+//         url: mergedUrl,
+//         filename: 'merged_video.mp4',
+//         saveAs: true
+//     });
+
+//     status.textContent = "Download started!";
+// });
+
+const { createFFmpeg, fetchFile } = FFmpeg;
+
+const ffmpeg = createFFmpeg({
+    corePath: chrome.runtime.getURL("libs/ffmpeg-core.js"),
+    log: true,
+    mainName: 'main'
 });
+
+async function runFFmpeg(outputFileName, commandStr, audioUrl, videoUrl) {
+    if (ffmpeg.isLoaded()) {
+        await ffmpeg.exit();
+    }
+
+    await ffmpeg.load();
+
+    const commandList = commandStr.split(' ');
+    if (commandList.shift() !== 'ffmpeg') {
+        alert('Please start with ffmpeg');
+        return;
+    }
+
+    // Fetch audio and video      
+    const [audioResponse, videoResponse] = await Promise.all([
+        fetch(audioUrl),
+        fetch(videoUrl)
+    ]);
+
+    const audioBlob = await audioResponse.blob();
+    const videoBlob = await videoResponse.blob();
+
+    const audioBuffer = new Uint8Array(await audioBlob.arrayBuffer());
+    const videoBuffer = new Uint8Array(await videoBlob.arrayBuffer());
+
+    ffmpeg.FS('writeFile', 'audio.mp4', await fetchFile(audioBuffer));
+    ffmpeg.FS('writeFile', 'video.mp4', await fetchFile(videoBuffer));
+
+    console.log(commandList);
+    await ffmpeg.run(...commandList);
+    const data = ffmpeg.FS('readFile', outputFileName);
+    const blob = new Blob([data.buffer]);
+    downloadFile(blob, outputFileName);
+}
+
+function downloadFile(blob, fileName) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fileName;
+    a.click();
+}
+
+
+document.getElementById("download").addEventListener("click", async () => {
+    const status = document.getElementById("status");
+    status.textContent = "Fetching files...";
+
+    const audioUrl = await new Promise(resolve =>
+        chrome.storage.local.get(["latestAudio"], result => resolve(result.latestAudio))
+    );
+
+    const videoUrl = await new Promise(resolve =>
+        chrome.storage.local.get(["latestVideo"], result => resolve(result.latestVideo))
+    );
+
+    runFFmpeg('output.mp4', 'ffmpeg -i video.mp4 -i audio.mp4 -c:v copy -c:a copy output.mp4',audioUrl,videoUrl)
+});
+
+
+
+// document.getElementById("download").addEventListener("click", async () => {
+//     const status = document.getElementById("status");
+//     status.textContent = "Fetching files...";
+
+//     // Retrieve URLs from storage
+//     const audioUrl = await new Promise(resolve =>
+//         chrome.storage.local.get(["latestAudio"], result => resolve(result.latestAudio))
+//     );
+
+//     const videoUrl = await new Promise(resolve =>
+//         chrome.storage.local.get(["latestVideo"], result => resolve(result.latestVideo))
+//     );
+
+//     if (!audioUrl || !videoUrl) {
+//         status.textContent = "Audio or video not found!";
+//         return;
+//     }
+
+//     status.textContent = "Downloading files...";
+
+//     // Fetch audio and video      
+//     const [audioResponse, videoResponse] = await Promise.all([
+//         fetch(audioUrl),
+//         fetch(videoUrl)
+//     ]);
+
+//     const audioBlob = await audioResponse.blob();
+//     const videoBlob = await videoResponse.blob();
+
+//     const audioBuffer = new Uint8Array(await audioBlob.arrayBuffer());
+//     const videoBuffer = new Uint8Array(await videoBlob.arrayBuffer());
+
+//     status.textContent = "Merging files with ffmpeg... (UI may freeze)";
+
+//     // Run ffmpeg synchronously on the main thread
+//     let stdout = "";
+//     let stderr = "";
+
+//     const result = ffmpeg({
+//         MEMFS: [
+//             { name: "video.mp4", data: videoBuffer },
+//             { name: "audio.m4a", data: audioBuffer }
+//         ],
+//         arguments: ["-i", "video.mp4", "-i", "audio.m4a", "-c:v", "copy", "-c:a", "aac", "output.mp4"],
+//         print: (data) => { stdout += data + "\n"; },
+//         printErr: (data) => { stderr += data + "\n"; },
+//         onExit: (code) => {
+//             console.log("FFmpeg exited with code:", code);
+//             console.log("FFmpeg stdout:", stdout);
+//             console.log("FFmpeg stderr:", stderr);
+//         }
+//     });
+
+//     // result.MEMFS now contains the output file
+//     const outputFile = result.MEMFS.find(file => file.name === "output.mp4");
+//     if (!outputFile) {
+//         status.textContent = "FFmpeg did not produce an output file.";
+//         console.error("No output file found:", stderr);
+//         return;
+//     }
+
+//     const mergedBlob = new Blob([outputFile.data], { type: 'video/mp4' });
+//     const mergedUrl = URL.createObjectURL(mergedBlob);
+
+//     // Trigger download
+//     chrome.downloads.download({
+//         url: mergedUrl,
+//         filename: 'merged_video.mp4',
+//         saveAs: true
+//     });
+
+//     status.textContent = "Download started!";
+// });
