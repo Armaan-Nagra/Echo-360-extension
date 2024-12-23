@@ -3,9 +3,19 @@ body {
     color: #eee;
 
     width: 16rem;
-    height: 4rem;
+    height: 16rem;
 }
 
 .special-text {
     color: red;
+}
+
+h3 {
+    text-align: center;
+}
+
+#download {
+    text-align: center;
+    display: flex;
+    justify-content: center;
 }
