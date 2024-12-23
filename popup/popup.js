@@ -6,52 +6,6 @@ const ffmpeg = createFFmpeg({
     mainName: 'main'
 });
 
-// async function fetchWithCombinedProgress(urls, progressElement, statusText) {
-//     let totalSize = 0;
-//     let loadedSize = 0;
-
-//     // Step 1: Get total size of both files
-//     const responses = await Promise.all(
-//         urls.map(async (url) => {
-//             const response = await fetch(url, { method: "HEAD" });
-//             if (!response.ok) throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
-//             const contentLength = response.headers.get("Content-Length");
-//             if (!contentLength) throw new Error("Unable to track progress: Content-Length header missing");
-//             totalSize += parseInt(contentLength, 10);
-//             return url;
-//         })
-//     );
-
-//     // Step 2: Fetch the files and track progress
-//     const blobs = await Promise.all(
-//         responses.map(async (url) => {
-//             const response = await fetch(url);
-//             if (!response.ok) throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
-
-//             const reader = response.body.getReader();
-//             const chunks = [];
-
-//             while (true) {
-//                 const { done, value } = await reader.read();
-//                 if (done) break;
-//                 chunks.push(value);
-//                 loadedSize += value.length;
-
-//                 // Update the progress bar and status
-//                 if (progressElement) {
-//                     progressElement.value = (loadedSize / totalSize) * 100;
-//                 }
-//                 if (statusText) {
-//                     statusText.textContent = `Downloading... ${(loadedSize / totalSize * 100).toFixed(2)}%`;
-//                 }
-//             }
-//             return new Blob(chunks);
-//         })
-//     );
-
-//     return blobs;
-// }
-
 async function fetchWithCombinedProgress(urls, progressElement, statusText) {
     let totalSize = 0;
     let loadedSize = 0;
