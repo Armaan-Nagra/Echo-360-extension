@@ -2,8 +2,9 @@ body {
   background-color: #2E2E2E;
   color: #eee;
 
-  width: 20rem;
+  width: 15rem;
   height: 10rem;
+  padding: 1rem;
 }
 
 .container {
@@ -36,8 +37,8 @@ h3 {
   --btn-font-size: 0.8rem; // Smaller font size
   --btn-text-color: hsla(0, 0%, 100%, 1);
   --btn-outline-color: hsla(0, 0%, 100%, 0.5);
-  --btn-front-bgc: hsla(0, 0%, 90%, 0.3);
-  --btn-front-bgc--hover: hsla(0, 0%, 90%, 0.75);
+  --btn-front-bgc: hsla(0, 2.20%, 91.20%, 0.19);
+  --btn-front-bgc--hover: hsla(0, 0.00%, 90.20%, 0.48);
 }
 
 button {
@@ -54,7 +55,7 @@ button {
 
 .btn {
   position: relative;
-  margin-top: 1rem;
+  margin-top: 2rem;
   padding: 0.5rem 1.5rem; // Smaller padding
   color: var(--btn-text-color);
   text-transform: uppercase;
