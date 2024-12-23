@@ -6,45 +6,147 @@ const ffmpeg = createFFmpeg({
     mainName: 'main'
 });
 
-async function runFFmpeg(outputFileName, commandStr, audioUrl, videoUrl,status) {
+// async function fetchWithCombinedProgress(urls, progressElement, statusText) {
+//     let totalSize = 0;
+//     let loadedSize = 0;
+
+//     // Step 1: Get total size of both files
+//     const responses = await Promise.all(
+//         urls.map(async (url) => {
+//             const response = await fetch(url, { method: "HEAD" });
+//             if (!response.ok) throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+//             const contentLength = response.headers.get("Content-Length");
+//             if (!contentLength) throw new Error("Unable to track progress: Content-Length header missing");
+//             totalSize += parseInt(contentLength, 10);
+//             return url;
+//         })
+//     );
+
+//     // Step 2: Fetch the files and track progress
+//     const blobs = await Promise.all(
+//         responses.map(async (url) => {
+//             const response = await fetch(url);
+//             if (!response.ok) throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+
+//             const reader = response.body.getReader();
+//             const chunks = [];
+
+//             while (true) {
+//                 const { done, value } = await reader.read();
+//                 if (done) break;
+//                 chunks.push(value);
+//                 loadedSize += value.length;
+
+//                 // Update the progress bar and status
+//                 if (progressElement) {
+//                     progressElement.value = (loadedSize / totalSize) * 100;
+//                 }
+//                 if (statusText) {
+//                     statusText.textContent = `Downloading... ${(loadedSize / totalSize * 100).toFixed(2)}%`;
+//                 }
+//             }
+//             return new Blob(chunks);
+//         })
+//     );
+
+//     return blobs;
+// }
+
+async function fetchWithCombinedProgress(urls, progressElement, statusText) {
+    let totalSize = 0;
+    let loadedSize = 0;
+
+    // Show the progress bar
+    if (progressElement) {
+        progressElement.style.display = "block";
+    }
+
+    const responses = await Promise.all(
+        urls.map(async (url) => {
+            const response = await fetch(url, { method: "HEAD" });
+            if (!response.ok) throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+            const contentLength = response.headers.get("Content-Length");
+            if (!contentLength) throw new Error("Unable to track progress: Content-Length header missing");
+            totalSize += parseInt(contentLength, 10);
+            return url;
+        })
+    );
+
+    const blobs = await Promise.all(
+        responses.map(async (url) => {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+
+            const reader = response.body.getReader();
+            const chunks = [];
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                chunks.push(value);
+                loadedSize += value.length;
+
+                // Update the progress bar and status
+                if (progressElement) {
+                    progressElement.value = (loadedSize / totalSize) * 100;
+                }
+                if (statusText) {
+                    statusText.textContent = `Downloading... ${(loadedSize / totalSize * 100).toFixed(2)}%`;
+                }
+            }
+            return new Blob(chunks);
+        })
+    );
+
+    // Hide the progress bar when done
+    if (progressElement) {
+        progressElement.style.display = "none";
+    }
+
+    return blobs;
+}
+
+async function runFFmpeg(outputFileName, commandStr, audioUrl, videoUrl, status, progressBar) {
     if (ffmpeg.isLoaded()) {
         await ffmpeg.exit();
     }
 
     await ffmpeg.load();
 
-    const commandList = commandStr.split(' ');
-    if (commandList.shift() !== 'ffmpeg') {
-        alert('Please start with ffmpeg');
+    const commandList = commandStr.split(" ");
+    if (commandList.shift() !== "ffmpeg") {
+        alert("Please start with ffmpeg");
         return;
     }
 
-    // Fetch audio and video      
-    const [audioResponse, videoResponse] = await Promise.all([
-        fetch(audioUrl),
-        fetch(videoUrl)
-    ]);
-
-    const audioBlob = await audioResponse.blob();
-    const videoBlob = await videoResponse.blob();
+    // Fetch files with a combined progress bar
+    status.textContent = "Fetching files...";
+    const [audioBlob, videoBlob] = await fetchWithCombinedProgress(
+        [audioUrl, videoUrl],
+        progressBar,
+        status
+    );
 
     const audioBuffer = new Uint8Array(await audioBlob.arrayBuffer());
     const videoBuffer = new Uint8Array(await videoBlob.arrayBuffer());
 
-    ffmpeg.FS('writeFile', 'audio.mp4', await fetchFile(audioBuffer));
-    ffmpeg.FS('writeFile', 'video.mp4', await fetchFile(videoBuffer));
+    status.textContent = "Writing to FFMPEG memory...";
+    ffmpeg.FS("writeFile", "audio.mp4", await fetchFile(audioBuffer));
+    ffmpeg.FS("writeFile", "video.mp4", await fetchFile(videoBuffer));
 
-    // console.log(commandList);
+    status.textContent = "Merging audio and video...";
     await ffmpeg.run(...commandList);
-    status.textContent = "Mergin audio and video";
-    const data = ffmpeg.FS('readFile', outputFileName);
+
+    const data = ffmpeg.FS("readFile", outputFileName);
     const blob = new Blob([data.buffer]);
     downloadFile(blob, outputFileName);
-    status.textContent = "";
+
+    status.textContent = "Download complete!";
+    progressBar.value = 0; // Reset progress bar
 }
 
 function downloadFile(blob, fileName) {
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = fileName;
     a.click();
@@ -82,9 +184,11 @@ async function getTitleFromPage() {
     });
 }
 
-
+// DOM Elements are retrieved ONCE here
 document.getElementById("download").addEventListener("click", async () => {
     const status = document.getElementById("status");
+    const progressBar = document.getElementById("progress-bar");
+
     status.textContent = "Fetching files...";
 
     let pageTitle;
@@ -95,7 +199,6 @@ document.getElementById("download").addEventListener("click", async () => {
         console.error("Failed to fetch page title:", error);
         pageTitle = "Unknown Title";
     }
-    console.log(pageTitle);
 
     const audioUrl = await new Promise(resolve =>
         chrome.storage.local.get(["latestAudio"], result => resolve(result.latestAudio))
@@ -107,7 +210,12 @@ document.getElementById("download").addEventListener("click", async () => {
 
     const outputFileName = `${pageTitle.replace(/[^a-zA-Z0-9]+/g, "-")}.mp4`;
 
-    runFFmpeg(outputFileName, `ffmpeg -i video.mp4 -i audio.mp4 -c:v copy -c:a copy ${outputFileName}`,audioUrl,videoUrl,status)
+    await runFFmpeg(
+        outputFileName,
+        `ffmpeg -i video.mp4 -i audio.mp4 -c:v copy -c:a copy ${outputFileName}`,
+        audioUrl,
+        videoUrl,
+        status,
+        progressBar
+    );
 });
-
-

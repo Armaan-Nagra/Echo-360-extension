@@ -1,21 +1,23 @@
 body {
-    background-color: #222;
+    background-color: #2E2E2E;
     color: #eee;
 
     width: 16rem;
-    height: 16rem;
+    height: 10rem;
 }
 
-.special-text {
-    color: red;
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Align items vertically */
+    justify-content: center; /* Align items horizontally */
+    gap: 10px; /* Space between elements */
 }
 
 h3 {
     text-align: center;
 }
 
-#download {
-    text-align: center;
-    display: flex;
-    justify-content: center;
+#progress-bar {
+    display: none;
 }
