@@ -36,7 +36,8 @@
     "web_accessible_resources": [
         {
             "resources": [
-                "libs/*"
+                "libs/*",
+                "fonts/*.ttf"
             ],
             "matches": [
                 "<all_urls>"

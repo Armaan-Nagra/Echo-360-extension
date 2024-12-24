@@ -2,8 +2,8 @@ body {
   background-color: #2E2E2E;
   color: #eee;
 
-  width: 15rem;
-  height: 10rem;
+  width: 12rem;
+  height: 7rem;
   padding: 1rem;
 }
 
@@ -24,6 +24,13 @@ h3 {
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Orbitron&display=swap");
+
+@font-face {
+  font-family: 'CustomFont';
+  src: url('../fonts/custom-font.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 *,
 *::after,
@@ -55,7 +62,7 @@ button {
 
 .btn {
   position: relative;
-  margin-top: 2rem;
+  margin-top: 1rem;
   padding: 0.5rem 1.5rem; // Smaller padding
   color: var(--btn-text-color);
   text-transform: uppercase;
@@ -143,5 +150,7 @@ button {
 
   .btn__text {
     transform: translate(0.25rem, -0.25rem);
+    font-size: var(--btn-font-size);
+    font-family: 'CustomFont', sans-serif; // Use your custom font
   }
 }

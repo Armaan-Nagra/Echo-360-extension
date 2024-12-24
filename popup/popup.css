@@ -1,9 +1,9 @@
-@import url("https://fonts.googleapis.com/css2?family=Orbitron&display=swap");
+
 body {
   background-color: #2E2E2E;
   color: #eee;
-  width: 15rem;
-  height: 10rem;
+  width: 12rem;
+  height: 7rem;
   padding: 1rem;
 }
 
@@ -21,6 +21,13 @@ h3 {
 
 #progress-bar {
   display: none;
+}
+
+@font-face {
+  font-family: "CustomFont";
+  src: url("../fonts/Inter_28pt-SemiBold.ttf") format("truetype");
+  font-weight: none;
+  font-style: none;
 }
 
 *,
@@ -53,7 +60,7 @@ button {
 
 .btn {
   position: relative;
-  margin-top: 2rem;
+  margin-top: 1rem;
   padding: 0.5rem 1.5rem;
   color: var(--btn-text-color);
   text-transform: uppercase;
@@ -101,6 +108,7 @@ button {
   display: inline-block;
   transition: 250ms all ease;
   font-size: var(--btn-font-size);
+  font-family: "CustomFont",cursive;
 }
 
 .btn:hover::before {
@@ -125,6 +133,8 @@ button {
 }
 .btn:active .btn__text {
   transform: translate(0.25rem, -0.25rem);
+  font-size: var(--btn-font-size);
+
 }
 
 /*# sourceMappingURL=popup.css.map */
