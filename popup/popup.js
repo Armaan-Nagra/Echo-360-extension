@@ -45,7 +45,7 @@ async function fetchWithCombinedProgress(urls, progressElement, statusText) {
                     progressElement.value = (loadedSize / totalSize) * 100;
                 }
                 if (statusText) {
-                    statusText.textContent = `Downloading... ${(loadedSize / totalSize * 100).toFixed(2)}%`;
+                    statusText.textContent = `Downloading... ${(loadedSize / totalSize * 100).toFixed(1)}%`;
                 }
             }
             return new Blob(chunks);

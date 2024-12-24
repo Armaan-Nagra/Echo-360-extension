@@ -1,10 +1,12 @@
-
 body {
   background-color: #2E2E2E;
   color: #eee;
   width: 12rem;
-  height: 7rem;
-  padding: 1rem;
+  height: 5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1.05rem;
 }
 
 .container {
@@ -13,6 +15,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
+  text-align: center;
 }
 
 h3 {
@@ -21,15 +24,15 @@ h3 {
 
 #progress-bar {
   display: none;
+  color: black;
 }
 
 @font-face {
   font-family: "CustomFont";
   src: url("../fonts/Inter_28pt-SemiBold.ttf") format("truetype");
-  font-weight: none;
-  font-style: none;
+  font-weight: normal;
+  font-style: normal;
 }
-
 *,
 *::after,
 *::before {
@@ -58,9 +61,12 @@ button {
   -webkit-appearance: none;
 }
 
+.btn__text {
+  font-family: "CustomFont", cursive;
+}
+
 .btn {
   position: relative;
-  margin-top: 1rem;
   padding: 0.5rem 1.5rem;
   color: var(--btn-text-color);
   text-transform: uppercase;
@@ -108,7 +114,6 @@ button {
   display: inline-block;
   transition: 250ms all ease;
   font-size: var(--btn-font-size);
-  font-family: "CustomFont",cursive;
 }
 
 .btn:hover::before {
@@ -134,7 +139,7 @@ button {
 .btn:active .btn__text {
   transform: translate(0.25rem, -0.25rem);
   font-size: var(--btn-font-size);
-
+  font-family: "CustomFont", sans-serif;
 }
 
 /*# sourceMappingURL=popup.css.map */

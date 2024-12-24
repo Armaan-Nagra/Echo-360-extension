@@ -3,9 +3,14 @@ body {
   color: #eee;
 
   width: 12rem;
-  height: 7rem;
-  padding: 1rem;
+  height: 5rem;
+
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  margin-top: 1.05rem;
 }
+
 
 .container {
   display: flex;
@@ -13,6 +18,8 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
+
+  text-align: center;
 }
 
 h3 {
@@ -21,13 +28,12 @@ h3 {
 
 #progress-bar {
   display: none;
+  color:black;
 }
-
-@import url("https://fonts.googleapis.com/css2?family=Orbitron&display=swap");
 
 @font-face {
   font-family: 'CustomFont';
-  src: url('../fonts/custom-font.ttf') format('truetype');
+  src: url('../fonts/Inter_28pt-SemiBold.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
@@ -60,9 +66,12 @@ button {
   -webkit-appearance: none;
 }
 
+.btn__text{
+  font-family: "CustomFont", cursive;
+}
+
 .btn {
   position: relative;
-  margin-top: 1rem;
   padding: 0.5rem 1.5rem; // Smaller padding
   color: var(--btn-text-color);
   text-transform: uppercase;
