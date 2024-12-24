@@ -1,10 +1,10 @@
 {
     "manifest_version": 3,
-    "name": "Echo 360 Downloader",
-    "description": "A Chrome Extension to allow you to download any Echo 360 Lecture at Warwick",
+    "name": "Warwick Lecture Downloader",
+    "description": "A Chrome Extension to allow Warwick students to download any Echo 360 Lecture",
     "version": "1.0",
     "action": {
-        "default_title": "Lecture Downloader",
+        "default_title": "Warwick Lecture Downloader",
         "default_popup": "popup/popup.html"
     },
     "host_permissions": [

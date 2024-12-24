@@ -28,7 +28,6 @@ h3 {
 
 #progress-bar {
   display: none;
-  color:black;
 }
 
 @font-face {
