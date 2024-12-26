@@ -4,4 +4,4 @@
 
 ## Demo
 
-Click [here]([https://your-demo-link.com](https://youtu.be/E79fH6qeGE8?si=zfhObuWZ-40ZRtJE)) for a demo.
+Click [here](https://youtu.be/E79fH6qeGE8?si=zfhObuWZ-40ZRtJE) for a demo.
