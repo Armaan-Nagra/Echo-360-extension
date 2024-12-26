@@ -1,6 +1,6 @@
 # Fetch360
 
-**Fetch360** is a Chrome extension designed for University of Warwick students, enabling them to easily download any lecture from Echo360. Simplify accessing your lecture materials with just a click!
+**Fetch360** is a Chrome extension designed for University of Warwick students, enabling them to easily download any lecture from Echo360. 
 
 ## Demo
 
