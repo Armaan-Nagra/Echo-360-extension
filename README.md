@@ -6,7 +6,8 @@
 
 Fetch 360 is published on the Chrome Web Store and you can download it [here](https://chromewebstore.google.com/detail/fetch-360/koaindoledjjcpohloicpdmamncepcjp?hl=en)
 
-We're trying to convert to other popular browsers such as Safari, Microsoft Edge etc... So stay tuned!
+Currently working on an implementation to allow students using Panopto to download lectures and also to convert to other popular browsers such as Safari, Microsoft Edge etc... So stay tuned!
+
 
 ## Demo
 
